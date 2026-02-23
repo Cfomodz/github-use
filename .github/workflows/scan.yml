@@ -1,0 +1,55 @@
+name: Repo Improvement Scan
+
+on:
+  schedule:
+    # Run weekly on Monday at 08:00 UTC
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+    inputs:
+      user:
+        description: "GitHub user to scan (blank = authenticated user)"
+        required: false
+        default: ""
+      no_ai:
+        description: "Skip AI analysis"
+        required: false
+        default: "false"
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run repo scanner
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.user }}" ]; then
+            ARGS="${{ github.event.inputs.user }}"
+          fi
+          if [ "${{ github.event.inputs.no_ai }}" = "true" ]; then
+            ARGS="$ARGS --no-ai"
+          fi
+          python -m repo_scanner $ARGS --output report.md --verbose
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-report
+          path: report.md
+          retention-days: 30
