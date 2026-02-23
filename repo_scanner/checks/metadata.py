@@ -18,6 +18,80 @@ class MetadataCheck:
     def run(self, repo: RepoInfo, contents: RepoContents) -> list[Finding]:
         findings: list[Finding] = []
 
+        # Empty / abandoned repo (no files or only a README)
+        non_meta_files = [
+            p for p in contents.tree_listing
+            if not p.lower().startswith(("readme", "license", ".git"))
+        ]
+        if not contents.tree_listing:
+            findings.append(Finding(
+                check_name=self.name,
+                severity=Severity.CRITICAL,
+                title="Repository appears empty",
+                detail="No files were found in the repository's default branch.",
+                suggestion=(
+                    "This repo has no content. Either add code, repurpose it, or consider deleting it "
+                    "to reduce clutter."
+                ),
+            ))
+        elif not non_meta_files:
+            findings.append(Finding(
+                check_name=self.name,
+                severity=Severity.WARNING,
+                title="Repository contains only meta files",
+                detail="The repo only has a README, LICENSE, or .git config — no actual project files.",
+                suggestion=(
+                    "This repo has no substantive content beyond boilerplate. Add project files, "
+                    "repurpose it, or consider deleting it."
+                ),
+            ))
+
+        # No detected programming language
+        if not repo.language:
+            findings.append(Finding(
+                check_name=self.name,
+                severity=Severity.WARNING,
+                title="No programming language detected",
+                detail="GitHub does not detect any programming language for this repository.",
+                suggestion=(
+                    "This usually means the repo is empty, config-only, or docs-only. "
+                    "If it should contain code, add source files. Otherwise consider whether "
+                    "this repo is still needed."
+                ),
+            ))
+
+        # Profile README repo (owner/owner)
+        if repo.name.lower() == repo.owner.lower():
+            findings.append(Finding(
+                check_name=self.name,
+                severity=Severity.INFO,
+                title="Profile README repository",
+                detail=(
+                    f"This is the special {repo.owner}/{repo.owner} profile repo. "
+                    "Its README appears on your GitHub profile page."
+                ),
+                suggestion=(
+                    "Make sure this README is up-to-date and represents you well — "
+                    "it's the first thing visitors see on your profile."
+                ),
+            ))
+
+        # .github org/user config repo
+        if repo.name.lower() == ".github":
+            findings.append(Finding(
+                check_name=self.name,
+                severity=Severity.INFO,
+                title="Organization/user .github config repository",
+                detail=(
+                    "This is the special .github repo for default community health files, "
+                    "issue templates, and funding config."
+                ),
+                suggestion=(
+                    "Ensure this repo contains useful defaults (issue templates, CONTRIBUTING.md, "
+                    "FUNDING.yml) that apply across your other repositories."
+                ),
+            ))
+
         # Description
         if not repo.description:
             findings.append(Finding(

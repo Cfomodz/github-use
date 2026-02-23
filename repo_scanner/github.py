@@ -67,31 +67,11 @@ def _run_gh(*args: str, ignore_errors: bool = False) -> str:
     return result.stdout.strip()
 
 
-def _is_source_repo(name: str, owner: str, language: str | None) -> bool:
-    """Return True if this looks like an actual source project (not a profile/config repo)."""
-    lower = name.lower()
-
-    # GitHub profile README repo (owner/owner)
-    if lower == owner.lower():
-        return False
-
-    # .github org-level config repo
-    if lower == ".github":
-        return False
-
-    # No programming language detected — likely empty or config-only
-    if not language:
-        return False
-
-    return True
-
-
 def list_repos(
     user: str | None = None,
     limit: int = 200,
     include_forks: bool = False,
     include_archived: bool = False,
-    source_only: bool = True,
 ) -> list[RepoInfo]:
     """List repositories for a user (or the authenticated user)."""
     cmd = ["repo", "list"]
@@ -126,17 +106,10 @@ def list_repos(
         issues_raw = item.get("issues") or []
         open_count = len(issues_raw) if isinstance(issues_raw, list) else item.get("openIssues", {}).get("totalCount", 0)
 
-        repo_name = item.get("name", "")
-        owner_login = owner_info.get("login", "") if isinstance(owner_info, dict) else str(owner_info)
-        lang = primary_lang.get("name") if isinstance(primary_lang, dict) else None
-
-        if source_only and not _is_source_repo(repo_name, owner_login, lang):
-            continue
-
         repos.append(RepoInfo(
             full_name=item.get("nameWithOwner", ""),
-            name=repo_name,
-            owner=owner_login,
+            name=item.get("name", ""),
+            owner=owner_info.get("login", "") if isinstance(owner_info, dict) else str(owner_info),
             description=item.get("description") or "",
             default_branch=branch_ref.get("name", "main") if isinstance(branch_ref, dict) else "main",
             is_fork=is_fork,
@@ -148,7 +121,7 @@ def list_repos(
             license_key=license_info.get("key") if isinstance(license_info, dict) else None,
             topics=topics,
             homepage=item.get("homepageUrl") or "",
-            language=lang,
+            language=primary_lang.get("name") if isinstance(primary_lang, dict) else None,
             stargazers_count=item.get("stargazerCount", 0),
             open_issues_count=open_count,
         ))

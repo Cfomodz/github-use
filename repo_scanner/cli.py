@@ -45,11 +45,6 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Include archived repositories.",
     )
     p.add_argument(
-        "--include-non-source",
-        action="store_true",
-        help="Include non-source repos (profile READMEs, .github config repos, repos with no detected language).",
-    )
-    p.add_argument(
         "--no-ai",
         action="store_true",
         help="Skip DeepSeek AI analysis (only run programmatic checks).",
@@ -111,7 +106,6 @@ def main(argv: list[str] | None = None) -> None:
             limit=args.limit,
             include_forks=args.include_forks,
             include_archived=args.include_archived,
-            source_only=not args.include_non_source,
         )
 
     if not repos:
