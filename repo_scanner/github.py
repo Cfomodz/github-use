@@ -103,8 +103,9 @@ def list_repos(
         else:
             topics = list(topics_raw)
 
-        issues_raw = item.get("issues") or []
-        open_count = len(issues_raw) if isinstance(issues_raw, list) else item.get("openIssues", {}).get("totalCount", 0)
+        # `issues` from `gh repo list --json issues` is a connection object: {totalCount: N}
+        issues_raw = item.get("issues") or {}
+        open_count = issues_raw.get("totalCount", 0) if isinstance(issues_raw, dict) else 0
 
         repos.append(RepoInfo(
             full_name=item.get("nameWithOwner", ""),
@@ -132,10 +133,12 @@ def fetch_repo_contents(repo: RepoInfo) -> RepoContents:
     """Fetch the file tree and key file contents for a repo via gh api."""
     contents = RepoContents()
 
-    # Get the recursive tree (lightweight – just paths)
+    # Get the recursive tree (lightweight – just paths).
+    # ?recursive=1 ensures nested paths (workflows, tests, etc.) are included.
+    # Note: GitHub truncates very large trees; if .truncated is true some paths may be missing.
     try:
         tree_raw = _run_gh(
-            "api", f"repos/{repo.full_name}/git/trees/{repo.default_branch}",
+            "api", f"repos/{repo.full_name}/git/trees/{repo.default_branch}?recursive=1",
             "--jq", ".tree[].path",
             ignore_errors=True,
         )

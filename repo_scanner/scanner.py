@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from repo_scanner.checks import Finding
+from repo_scanner.checks import Finding, Severity
 from repo_scanner.checks.readme import ReadmeCheck
 from repo_scanner.checks.license import LicenseCheck
 from repo_scanner.checks.workflows import WorkflowsCheck
@@ -54,7 +54,7 @@ def scan_repo(
         except Exception as exc:
             result.findings.append(Finding(
                 check_name=check.name,
-                severity=__import__("repo_scanner.checks", fromlist=["Severity"]).Severity.INFO,
+                severity=Severity.INFO,
                 title=f"Check '{check.name}' errored",
                 detail=str(exc),
                 suggestion="This check encountered an unexpected error. Please report it.",

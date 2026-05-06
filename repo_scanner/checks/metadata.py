@@ -21,7 +21,8 @@ class MetadataCheck:
         # Empty / abandoned repo (no files or only a README)
         non_meta_files = [
             p for p in contents.tree_listing
-            if not p.lower().startswith(("readme", "license", ".git"))
+            if not p.lower().startswith(("readme", "license"))
+            and (not p.lower().startswith(".git") or p.lower().startswith(".github"))
         ]
         if not contents.tree_listing:
             findings.append(Finding(

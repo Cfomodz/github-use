@@ -151,6 +151,12 @@ def _fetch_specific_repos(repo_names: list[str]) -> list[RepoInfo]:
         license_info = item.get("license") or {}
         topics = item.get("topics", [])
 
+        # Normalize to lowercase key matching licenseInfo.key from list_repos.
+        # The REST API returns spdx_id in uppercase (e.g. "MIT") or "NOASSERTION"
+        # for unrecognised licenses; map both empty and "NOASSERTION" to None.
+        spdx_id = license_info.get("spdx_id") if isinstance(license_info, dict) else None
+        license_key = spdx_id.lower() if spdx_id and spdx_id.upper() != "NOASSERTION" else None
+
         repos.append(RepoInfo(
             full_name=item.get("full_name", name),
             name=item.get("name", name.split("/")[-1]),
@@ -163,7 +169,7 @@ def _fetch_specific_repos(repo_names: list[str]) -> list[RepoInfo]:
             has_issues=item.get("has_issues", True),
             has_wiki=item.get("has_wiki", False),
             has_pages=item.get("has_pages", False),
-            license_key=license_info.get("spdx_id") if isinstance(license_info, dict) else None,
+            license_key=license_key,
             topics=topics,
             homepage=item.get("homepage") or "",
             language=item.get("language"),
