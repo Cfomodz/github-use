@@ -13,12 +13,12 @@ Legend: ✅ audited · 🔄 in progress · ⬜ queued
 | ✅ [github-use](audits/github-use.md) | 2026-07-28 | `--include-forks` broken; fails own license/tests checks |
 | 🔄 StreamDrop | 2026-07-28 | agent audit running |
 | 🔄 spam-baiter | 2026-07-28 | agent audit running |
-| 🔄 browser-osint | 2026-07-28 | agent audit running |
+| ✅ [browser-osint](audits/browser-osint.md) | 2026-07-28 | CWD-relative templates kill detection; broken Google reverse-search; stale docs |
 | 🔄 audible-to-yoto | 2026-07-28 | agent audit running |
-| 🔄 Brother-QL-710W_Incrementing-Label-Creator | 2026-07-28 | agent audit running |
+| ✅ [Brother-QL-710W_Incrementing-Label-Creator](audits/Brother-QL-710W_Incrementing-Label-Creator.md) | 2026-07-28 | won't start (missing template modules); no deps manifest; counter race |
 | 🔄 dmarket_bot | 2026-07-28 | agent audit running |
-| 🔄 Inbox-Sorter | 2026-07-28 | agent audit running |
-| 🔄 steam_user_stats | 2026-07-28 | agent audit running |
+| ✅ [Inbox-Sorter](audits/Inbox-Sorter.md) | 2026-07-28 | stored XSS via From: header; unauthenticated cache routes |
+| ✅ [steam_user_stats](audits/steam_user_stats.md) | 2026-07-28 | debug=True on 0.0.0.0 (RCE); API key over plain HTTP; DOM XSS |
 
 ## Queue (own, non-fork, most recently active first)
 
