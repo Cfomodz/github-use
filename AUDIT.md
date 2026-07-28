@@ -11,12 +11,12 @@ Legend: ✅ audited · 🔄 in progress · ⬜ queued
 | Repo | Date | Notes |
 |---|---|---|
 | ✅ [github-use](audits/github-use.md) | 2026-07-28 | `--include-forks` broken; fails own license/tests checks |
-| 🔄 StreamDrop | 2026-07-28 | agent audit running |
+| ✅ [StreamDrop](audits/StreamDrop.md) | 2026-07-28 | deadlock on update/delete; auto-recovery can't restart; unauthenticated API leaks stream keys |
 | ✅ [spam-baiter](audits/spam-baiter.md) | 2026-07-28 | missing soundboard files crash live calls; phantom bluetooth bridge; deps can't install |
 | ✅ [browser-osint](audits/browser-osint.md) | 2026-07-28 | CWD-relative templates kill detection; broken Google reverse-search; stale docs |
 | ✅ [audible-to-yoto](audits/audible-to-yoto.md) | 2026-07-28 | ffmpeg loop skips books after first; `set -e` defeats error handling; placeholder badges |
 | ✅ [Brother-QL-710W_Incrementing-Label-Creator](audits/Brother-QL-710W_Incrementing-Label-Creator.md) | 2026-07-28 | won't start (missing template modules); no deps manifest; counter race |
-| 🔄 dmarket_bot | 2026-07-28 | agent audit running |
+| ✅ [dmarket_bot](audits/dmarket_bot.md) | 2026-07-28 | buy loop crashes every cycle (str/float compare); zip misalignment = wrong-price orders |
 | ✅ [Inbox-Sorter](audits/Inbox-Sorter.md) | 2026-07-28 | stored XSS via From: header; unauthenticated cache routes |
 | ✅ [steam_user_stats](audits/steam_user_stats.md) | 2026-07-28 | debug=True on 0.0.0.0 (RCE); API key over plain HTTP; DOM XSS |
 
